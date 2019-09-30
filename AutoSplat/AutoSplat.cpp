@@ -654,6 +654,35 @@ int CopyTIM2Buffer(int sourcex, int sourcey, int destx, int desty, int rot)
 {
 	// TO DO: Implement this function (see slides)
 
+	//TO DO: Rotate image display by rot value
+	//0=Normal
+	//1=XFlip
+	//2=Rot 90
+	//3=XFlip,Rot 90
+	//4=Rot 180
+	//5=YFlip
+	//6=Rot270
+	//7=Rot270,XFlip
+	
+
+	for (int x = 0; x < 32; x++)
+	{
+		for (int y = 0; y < 32; y++)
+		{
+			switch (rot)
+			{
+			case 0:
+				{
+				SetBufferPixel(destx + x, desty + y, GetPixel(sourcex + x, sourcey + y));
+					break;
+				}
+			default:
+				SetBufferPixel(destx + x, desty + y, GetPixel(sourcex + x, sourcey + y));
+				break;
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -686,9 +715,15 @@ int DrawSegments2Buffer(SEGMENT* pSegments)
 		//Loop for POLYSTRUCT
 		for (int i = 0; i < 16; i++)
 		{
+			//Tile Orientation
 			int tileRot = pSegment->strTilePolyStruct[i].cRot;
+			//Tile Index
 			int tileIndex = pSegment->strTilePolyStruct[i].cTileRef;
-			int mapIndex = (x + 1) * (i + 1);
+			//Map Index
+			//0-64
+			int mapIndex = (16*x)+i;
+
+			//TO DO: Figure out whats going wrong with this
 			CopyTIM2Buffer(_TIMXPOS(tileIndex), _TIMXPOS(tileIndex), _MAPXPOS(mapIndex), _MAPYPOS(mapIndex), tileRot);
 		}
 	}
