@@ -713,7 +713,7 @@ int CopyTIM2Buffer(int sourcex, int sourcey, int destx, int desty, int rot)
 				}
 				default://Error: don't render it so that the error is visible
 				{
-					//SetBufferPixel(destx + x, desty + y, GetPixel(sourcex + x, sourcey + y));
+					SetBufferPixel(destx + x, desty + y, GetPixel(sourcex + x, sourcey + y));
 					break;
 				}
 			}
@@ -743,32 +743,56 @@ int DrawSegments2Buffer(SEGMENT* pSegments)
 
 	//Polystructs are stored as an array [16]
 
-	int mapIndex = 0;
+	int mapX, mapY(0);
+	int tileRot(0);
+	int tileIndex(0);
 	//Loop for SEGMENTS
-	for (int y = 0; y < 256; y++)
+	for (int segment = 0; segment < 256; segment++)
 	{
 		//Pointer to current SEGMENT
-		SEGMENT *pSegment = &pSegments[y];
+		SEGMENT *pSegment = &pSegments[segment];
 
-		//Loop for POLYSTRUCT
-		for (int i = 0; i < 16; i++)
+		//Loop for POLYSTRUCT / Each grid square
+		//for (int i = 0; i < 16; i++)
+		//{
+		//	//Tile Orientation
+		//	tileRot = pSegment->strTilePolyStruct[i].cRot;
+		//	//Tile Index
+		//	tileIndex = pSegment->strTilePolyStruct[i].cTileRef;
+
+
+		//	//TODO: Figure out mapIndex/mapCoordinates
+
+		//	//This is right but not quite, it output the right tiles in the right order, but they are too far appart
+		//	//Removing the *4 shrinks them back together however they are now missing some inbetween tiles
+		//	//replaceing 16 with 64 means that only 4 rows are fulled
+		//	//mapX = (segment % (16)) * 32 * 4;
+		//	//mapY = floor(segment / (16)) * 32 * 4;
+
+		//	//There are 4096 tiles
+		//	//256*16 (Segments * Polystructs)
+
+		//	mapX = (segment % (16)) * 32;
+		//	mapY = floor(segment / (16)) * 32;
+
+		//	CopyTIM2Buffer(_TIMXPOS(tileIndex), _TIMYPOS(tileIndex), mapX, mapY, tileRot);
+		//}
+
+		for (int i = 0; i < 4; i++)
 		{
-			//Tile Orientation
-			int tileRot = pSegment->strTilePolyStruct[i].cRot;
-			//Tile Index
-			int tileIndex = pSegment->strTilePolyStruct[i].cTileRef;
+			for (int z = 0; z < 4; z++)
+			{
+				tileRot = pSegment->strTilePolyStruct[(i * 4) + z].cRot;
+				tileIndex = pSegment->strTilePolyStruct[(i * 4) + z].cTileRef;
 
-			//Map Index
-			//0-255 (64x64)
+				mapX = ((segment % 16)*4) + z;
+				mapY = (floor(segment / 16)*4) + i;
 
-			
-
-			//TO DO: Figure out whats going wrong with this
-			CopyTIM2Buffer(_TIMXPOS(tileIndex), _TIMYPOS(tileIndex), _MAPXPOS(mapIndex), _MAPYPOS(mapIndex), tileRot);
-
-			mapIndex += 1;
+				CopyTIM2Buffer(_TIMXPOS(tileIndex), _TIMYPOS(tileIndex), mapX * 32, mapY * 32, tileRot);
+			}
 		}
 	}
+
 
 	return 0;
 }
