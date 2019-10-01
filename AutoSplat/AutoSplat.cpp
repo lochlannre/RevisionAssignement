@@ -654,6 +654,72 @@ int CopyTIM2Buffer(int sourcex, int sourcey, int destx, int desty, int rot)
 {
 	// TO DO: Implement this function (see slides)
 
+	//TO DO: Rotate image display by rot value
+	//0=Normal
+	//1=XFlip
+	//2=Rot 90
+	//3=XFlip,Rot 90
+	//4=Rot 180
+	//5=YFlip
+	//6=Rot270
+	//7=Rot270,XFlip
+	
+
+	for (int y = 0; y < 32; y++)
+	{
+		for (int x = 0; x < 32; x++)
+		{
+			switch (rot)
+			{
+				case 0://Normal
+				{
+					SetBufferPixel(destx + x, desty + y, GetPixel(sourcex + x, sourcey + y));
+					break;
+				}
+				case 1://XFlip
+				{
+					SetBufferPixel(destx + x, desty + y, GetPixel(sourcex + (31-x), sourcey + y));
+					break;
+				}
+				case 2://Rot 90
+				{
+					SetBufferPixel(destx + (31 - y), desty + x, GetPixel(sourcex + x, sourcey + y));
+					break;
+				}
+				case 3://XFlip, Rot 90
+				{
+					SetBufferPixel(destx + (31-y), desty + x, GetPixel(sourcex + (31-x), sourcey + y));
+					break;
+				}
+				case 4://Rotate 180
+				{
+					SetBufferPixel(destx + x, desty + y, GetPixel(sourcex + (31 - x), sourcey + (31 - y)));
+					break;
+				}
+				case 5://YFlip
+				{
+					SetBufferPixel(destx + x, desty + y, GetPixel(sourcex + x, sourcey + (31 - y)));
+					break;
+				}
+				case 6://Rot 270
+				{
+					SetBufferPixel(destx + y, desty + (31-x), GetPixel(sourcex + x, sourcey + (31-y)));//Not sure on this
+					break;
+				}
+				case 7://Rot 270 XFlip
+				{
+					SetBufferPixel(destx + (31-y), desty + (31 - x), GetPixel(sourcex + x, sourcey + (31 - y)));//Not sure on this
+					break;
+				}
+				default://Error: don't render it so that the error is visible
+				{
+					//SetBufferPixel(destx + x, desty + y, GetPixel(sourcex + x, sourcey + y));
+					break;
+				}
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -677,19 +743,30 @@ int DrawSegments2Buffer(SEGMENT* pSegments)
 
 	//Polystructs are stored as an array [16]
 
+	int mapIndex = 0;
 	//Loop for SEGMENTS
-	for (int x = 0; x < 16; x++)
+	for (int y = 0; y < 256; y++)
 	{
 		//Pointer to current SEGMENT
-		SEGMENT *pSegment = &pSegments[x];
+		SEGMENT *pSegment = &pSegments[y];
 
 		//Loop for POLYSTRUCT
 		for (int i = 0; i < 16; i++)
 		{
+			//Tile Orientation
 			int tileRot = pSegment->strTilePolyStruct[i].cRot;
+			//Tile Index
 			int tileIndex = pSegment->strTilePolyStruct[i].cTileRef;
-			int mapIndex = (x + 1) * (i + 1);
-			CopyTIM2Buffer(_TIMXPOS(tileIndex), _TIMXPOS(tileIndex), _MAPXPOS(mapIndex), _MAPYPOS(mapIndex), tileRot);
+
+			//Map Index
+			//0-255 (64x64)
+
+			
+
+			//TO DO: Figure out whats going wrong with this
+			CopyTIM2Buffer(_TIMXPOS(tileIndex), _TIMYPOS(tileIndex), _MAPXPOS(mapIndex), _MAPYPOS(mapIndex), tileRot);
+
+			mapIndex += 1;
 		}
 	}
 
