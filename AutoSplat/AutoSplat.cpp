@@ -703,17 +703,17 @@ int CopyTIM2Buffer(int sourcex, int sourcey, int destx, int desty, int rot)
 				}
 				case 6://Rot 270
 				{
-					SetBufferPixel(destx + y, desty + (31-x), GetPixel(sourcex + x, sourcey + (31-y)));//Not sure on this
+					SetBufferPixel(destx + (31-y), desty + (31-x), GetPixel(sourcex + x, sourcey + (31-y)));//Not sure on this
 					break;
 				}
 				case 7://Rot 270 XFlip
 				{
-					SetBufferPixel(destx + (31-y), desty + (31 - x), GetPixel(sourcex + x, sourcey + (31 - y)));//Not sure on this
+					SetBufferPixel(destx + (31-y), desty + (31 - x), GetPixel(sourcex + (31-x), sourcey + (31 - y)));//Not sure on this
 					break;
 				}
-				default://Error: don't render it so that the error is visible
+				default://Error: Tile has an invalid rotation or no rotation, don't render so that error is visible
 				{
-					SetBufferPixel(destx + x, desty + y, GetPixel(sourcex + x, sourcey + y));
+					//SetBufferPixel(destx + x, desty + y, GetPixel(sourcex + x, sourcey + y));
 					break;
 				}
 			}
@@ -778,6 +778,8 @@ int DrawSegments2Buffer(SEGMENT* pSegments)
 		//	CopyTIM2Buffer(_TIMXPOS(tileIndex), _TIMYPOS(tileIndex), mapX, mapY, tileRot);
 		//}
 
+		//Above this is outputting each Polystruct/tile next to each other not in a 4x4 which is should be
+		//Now it is doing that, meaning the previously mentioned fix now works.
 		for (int i = 0; i < 4; i++)
 		{
 			for (int z = 0; z < 4; z++)
