@@ -703,12 +703,12 @@ int CopyTIM2Buffer(int sourcex, int sourcey, int destx, int desty, int rot)
 				}
 				case 6://Rot 270
 				{
-					SetBufferPixel(destx + (31-y), desty + (31-x), GetPixel(sourcex + x, sourcey + (31-y)));//Not sure on this
+					SetBufferPixel(destx + (31-y), desty + (31-x), GetPixel(sourcex + x, sourcey + (31-y)));
 					break;
 				}
 				case 7://Rot 270 XFlip
 				{
-					SetBufferPixel(destx + (31-y), desty + (31 - x), GetPixel(sourcex + (31-x), sourcey + (31 - y)));//Not sure on this
+					SetBufferPixel(destx + (31-y), desty + (31 - x), GetPixel(sourcex + (31-x), sourcey + (31 - y)));
 					break;
 				}
 				default://Error: Tile has an invalid rotation or no rotation, don't render so that error is visible
@@ -752,6 +752,23 @@ int DrawSegments2Buffer(SEGMENT* pSegments)
 		//Pointer to current SEGMENT
 		SEGMENT *pSegment = &pSegments[segment];
 
+		//This could have been done without the 2 extra for loops, however to get z and I would require more divisions and modulus' which I believe would be slower that setting up an extra for loop.
+		for (int i = 0; i < 4; i++)
+		{
+			for (int z = 0; z < 4; z++)
+			{
+				tileRot = pSegment->strTilePolyStruct[(i * 4) + z].cRot;
+				tileIndex = pSegment->strTilePolyStruct[(i * 4) + z].cTileRef;
+
+				mapX = ((segment % 16)*4) + z;
+				mapY = (floor(segment / 16)*4) + i;
+
+				CopyTIM2Buffer(_TIMXPOS(tileIndex), _TIMYPOS(tileIndex), mapX * 32, mapY * 32, tileRot);
+			}
+		}
+		//Below this is an attempt outputting each Polystruct/tile next to each other not in a 4x4 which is should be
+		//Now it is doing that, meaning the previously mentioned fix now works.
+
 		//Loop for POLYSTRUCT / Each grid square
 		//for (int i = 0; i < 16; i++)
 		//{
@@ -777,22 +794,6 @@ int DrawSegments2Buffer(SEGMENT* pSegments)
 
 		//	CopyTIM2Buffer(_TIMXPOS(tileIndex), _TIMYPOS(tileIndex), mapX, mapY, tileRot);
 		//}
-
-		//Above this is outputting each Polystruct/tile next to each other not in a 4x4 which is should be
-		//Now it is doing that, meaning the previously mentioned fix now works.
-		for (int i = 0; i < 4; i++)
-		{
-			for (int z = 0; z < 4; z++)
-			{
-				tileRot = pSegment->strTilePolyStruct[(i * 4) + z].cRot;
-				tileIndex = pSegment->strTilePolyStruct[(i * 4) + z].cTileRef;
-
-				mapX = ((segment % 16)*4) + z;
-				mapY = (floor(segment / 16)*4) + i;
-
-				CopyTIM2Buffer(_TIMXPOS(tileIndex), _TIMYPOS(tileIndex), mapX * 32, mapY * 32, tileRot);
-			}
-		}
 	}
 
 
